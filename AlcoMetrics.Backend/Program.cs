@@ -1,4 +1,5 @@
-using IdentityServer4.AccessTokenValidation;
+using IdentityModel;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using WebApp.Extensions;
 using WebApp.Services.AccountServices;
 using WebApp.Services.AccountServices.Abstract;
@@ -23,19 +24,28 @@ namespace AlcoMetrics.Backend
                 });
             });
 
-            builder.Services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
-            .AddIdentityServerAuthentication(options =>
+            builder.Services
+            .AddAuthentication(options =>
             {
-                options.Authority = builder.Configuration.TryGetValue("AuthSetting:ShareSettings:GetTokenPath", "Конфиги не содержат домен IdentityServer");
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                //Описание с AddJwtBearer для поддержки IdenittyModel 7.0
+                options.Authority = builder.Configuration.TryGetValue("AuthSetting:ShareSettings:AuthenticationServicePath", "Конфиги не содержат домен IdentityServer");
                 options.RequireHttpsMetadata = false;
-                options.ApiName = builder.Configuration.TryGetValue("AuthSetting:IdentitySettings:ApiName", "Конфиги не содержат наименование API для IdentityServer");
-                options.ApiSecret = builder.Configuration.TryGetValue("AuthSetting:IdentitySettings:ApiSecret", "Конфиги не содержат секрет API для IdentityServer");
+                options.TokenValidationParameters.ValidAudiences = new List<string>() {
+                    builder.Configuration.TryGetValue("AuthSetting:IdentitySettings:ApiName", "Конфиги не содержат наименование API для IdentityServer"),
+                    builder.Configuration.TryGetValue("AuthSetting:IdentitySettings:ApiSecret", "Конфиги не содержат секрет API для IdentityServer"),
+                    JwtClaimTypes.Role
+            };
             });
 
             builder.Services.AddControllers();
 
-            builder.Services.AddScoped<IIdentityApiService, IdentityApiService>();
-            builder.Services.AddScoped<IAccountService, AccountService>();
+            builder.Services.AddTransient<IIdentityApiService, IdentityApiService>();
+            builder.Services.AddTransient<IAccountService, AccountService>();
 
             var app = builder.Build();
 

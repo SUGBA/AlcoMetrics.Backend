@@ -36,7 +36,6 @@ namespace WebApp.Services.API.IdentityApi
                 ClientId = clientId,
                 ClientSecret = secret,
                 Scope = string.Join(" ", scope),
-                //Scope = scope.LastOrDefault(),
                 UserName = login,
                 Password = password
             };
