@@ -1,4 +1,6 @@
-﻿namespace WebApp.Services.API.IdentityApi.Abstract
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace WebApp.Services.API.IdentityApi.Abstract
 {
     /// <summary>
     /// Сервиc связи с identity server
@@ -14,11 +16,19 @@
         public Task<string?> GetTokenByPasswordGrantType(string login, string password);
 
         /// <summary>
-        /// Регистрация по логину и паролю
+        /// Регистрация пользователя по логину и паролю
         /// </summary>
         /// <param name="login"> Логин </param>
         /// <param name="password"> Пароль </param>
         /// <returns></returns>
-        public Task<string?> RegisterByPasswordGrantType(string login, string password);
+        public Task<IEnumerable<string>?> RegisterUserByPasswordGrantType(string login, string password);
+
+        /// <summary>
+        /// Регистрация администратора по логину и паролю
+        /// </summary>
+        /// <param name="login"> Логин </param>
+        /// <param name="password"> Пароль </param>
+        /// <returns></returns>
+        public Task<IEnumerable<string>?> RegisterAdminByPasswordGrantType(string login, string password);
     }
 }

@@ -1,4 +1,5 @@
-﻿using WebApp.Data.ViewModel.Request.Account;
+﻿using Microsoft.AspNetCore.Identity;
+using WebApp.Data.ViewModel.Request.Account;
 
 namespace WebApp.Services.AccountServices.Abstract
 {
@@ -15,10 +16,17 @@ namespace WebApp.Services.AccountServices.Abstract
         public Task<string?> Login(LoginViewModel model);
 
         /// <summary>
-        /// Зарегестрироваться
+        /// Зарегестрировать пользователя
         /// </summary>
         /// <param name="model"> Модель с логином и паролем </param>
         /// <returns></returns>
-        public Task<string?> Register(RegisterViewModel model);
+        public Task<IEnumerable<string>> RegisterUser(RegisterUserViewModel model);
+
+        /// <summary>
+        /// Зарегестрировать администратора
+        /// </summary>
+        /// <param name="model"> Модель с логином и паролем </param>
+        /// <returns></returns>
+        public Task<IEnumerable<string>> RegisterAdmin(RegisterAdminViewModel model);
     }
 }

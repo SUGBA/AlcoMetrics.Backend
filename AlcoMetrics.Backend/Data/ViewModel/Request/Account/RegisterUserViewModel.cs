@@ -3,5 +3,5 @@
     /// <summary>
     /// View-Model для регистрации пользователя
     /// </summary>
-    public class RegisterViewModel : BaseAccountViewModel { }
+    public class RegisterUserViewModel : BaseAccountViewModel { }
 }

@@ -1,4 +1,7 @@
 ﻿using IdentityModel.Client;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Net.Http.Headers;
 using WebApp.Extensions;
 using WebApp.Services.API.IdentityApi.Abstract;
 
@@ -11,17 +14,26 @@ namespace WebApp.Services.API.IdentityApi
     {
         private readonly IConfiguration _configuration;
 
-        public IdentityApiService(IConfiguration configuration)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public IdentityApiService(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
         }
 
+        /// <summary>
+        /// Получить токен по логину и паролю
+        /// </summary>
+        /// <param name="login"> Логин и пароль </param>
+        /// <param name="password"> Пароль </param>
+        /// <returns></returns>
         public async Task<string?> GetTokenByPasswordGrantType(string login, string password)
         {
             var httpClient = new HttpClient();
 
-            var domenPath = _configuration.TryGetValue("AuthSetting:ShareSettings:AuthenticationServicePath", "Конфигурация не содержит доменный путь");
-            var getTokenPath = _configuration.TryGetValue("AuthSetting:ShareSettings:GetTokenPath", "Конфигурация не содержит путь для получения токена");
+            var domenPath = _configuration.TryGetValue("ApiIntegrationSettings:IdentityService:AuthenticationServicePath", "Конфигурация не содержит доменный путь");
+            var getTokenPath = _configuration.TryGetValue("ApiIntegrationSettings:IdentityService:GetTokenPath", "Конфигурация не содержит путь для получения токена");
             var scope = _configuration.TryGetValues("AuthSetting:WineClientSettings:Scopes", "Конфигурация не содержит scopes");
             var clientId = _configuration.TryGetValue("AuthSetting:WineClientSettings:ClientId", "Конфигурация не содержит id клиента");
             var secret = _configuration.TryGetValue("AuthSetting:WineClientSettings:WineAuthSecret", "Конфигурация не содержит пользовательский секрет");
@@ -50,7 +62,36 @@ namespace WebApp.Services.API.IdentityApi
             return null;
         }
 
-        public Task<string?> RegisterByPasswordGrantType(string login, string password)
+        /// <summary>
+        /// Регистрация администратора по логину и паролю
+        /// </summary>
+        /// <param name="login"> Логин </param>
+        /// <param name="password"> Пароль </param>
+        /// <returns></returns>
+        public async Task<IEnumerable<string>?> RegisterAdminByPasswordGrantType(string login, string password)
+        {
+            if (_httpContextAccessor.HttpContext == null) throw new NullReferenceException("HttpContext имеет значение null, при попытке регистрации администратора");
+            var jwtToken = _httpContextAccessor.HttpContext.Request.Headers[HeaderNames.Authorization];     //Токен с ключевым словом Bearer
+
+            var domenPath = _configuration.TryGetValue("ApiIntegrationSettings:IdentityService:AuthenticationServicePath", "Конфигурация не содержит доменный путь до Identity Server");
+            var registerAdminPath = _configuration.TryGetValue("ApiIntegrationSettings:IdentityService:RegisterAdminPath", "Конфигурация не содержит путь для регистрации пользователя до Identity Server");
+
+            var path = $"{domenPath}/{registerAdminPath}";
+
+            var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Add(HeaderNames.Authorization, jwtToken.ToString());
+            using var response = await httpClient.PostAsJsonAsync(path, new { Login = login, Password = password });
+
+            return await response.Content.ReadFromJsonAsync<IEnumerable<string>>();
+        }
+
+        /// <summary>
+        /// Регистрация пользователя по логину и паролю
+        /// </summary>
+        /// <param name="login"> Логин </param>
+        /// <param name="password"> Пароль </param>
+        /// <returns></returns>
+        public async Task<IEnumerable<string>?> RegisterUserByPasswordGrantType(string login, string password)
         {
             throw new NotImplementedException();
         }

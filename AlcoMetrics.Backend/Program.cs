@@ -33,7 +33,7 @@ namespace AlcoMetrics.Backend
             .AddJwtBearer(options =>
             {
                 //Описание с AddJwtBearer для поддержки IdenittyModel 7.0
-                options.Authority = builder.Configuration.TryGetValue("AuthSetting:ShareSettings:AuthenticationServicePath", "Конфиги не содержат домен IdentityServer");
+                options.Authority = builder.Configuration.TryGetValue("ApiIntegrationSettings:IdentityService:AuthenticationServicePath", "Конфиги не содержат домен IdentityServer");
                 options.RequireHttpsMetadata = false;
                 options.TokenValidationParameters.ValidAudiences = new List<string>() {
                     builder.Configuration.TryGetValue("AuthSetting:IdentitySettings:ApiName", "Конфиги не содержат наименование API для IdentityServer"),
@@ -42,10 +42,12 @@ namespace AlcoMetrics.Backend
             };
             });
 
-            builder.Services.AddControllers();
-
+            builder.Services.AddHttpContextAccessor();
+            //builder.Services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddTransient<IIdentityApiService, IdentityApiService>();
             builder.Services.AddTransient<IAccountService, AccountService>();
+
+            builder.Services.AddControllers();
 
             var app = builder.Build();
 
