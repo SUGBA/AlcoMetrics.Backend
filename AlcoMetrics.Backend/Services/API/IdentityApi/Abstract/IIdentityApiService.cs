@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-
-namespace WebApp.Services.API.IdentityApi.Abstract
+﻿namespace WebApp.Services.API.IdentityApi.Abstract
 {
     /// <summary>
     /// Сервиc связи с identity server
@@ -20,8 +18,9 @@ namespace WebApp.Services.API.IdentityApi.Abstract
         /// </summary>
         /// <param name="login"> Логин </param>
         /// <param name="password"> Пароль </param>
+        /// <param name="userRole"> Роль пользователя </param>
         /// <returns></returns>
-        public Task<IEnumerable<string>?> RegisterUserByPasswordGrantType(string login, string password);
+        public Task<IEnumerable<string>?> RegisterUserByPasswordGrantType(string login, string password, int userRole);
 
         /// <summary>
         /// Регистрация администратора по логину и паролю

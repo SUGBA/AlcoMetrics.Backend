@@ -12,8 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\ViewModel\Response\" />
-    <Folder Include="Services\API\WineApi\" />
+    <Folder Include="Data\ViewModel\Response\Account\" />
   </ItemGroup>
 
 </Project>

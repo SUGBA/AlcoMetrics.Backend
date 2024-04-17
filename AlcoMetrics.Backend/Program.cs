@@ -5,6 +5,8 @@ using WebApp.Services.AccountServices;
 using WebApp.Services.AccountServices.Abstract;
 using WebApp.Services.API.IdentityApi;
 using WebApp.Services.API.IdentityApi.Abstract;
+using WebApp.Services.API.WineApi;
+using WebApp.Services.API.WineApi.Abstract;
 
 namespace AlcoMetrics.Backend
 {
@@ -43,7 +45,7 @@ namespace AlcoMetrics.Backend
             });
 
             builder.Services.AddHttpContextAccessor();
-            //builder.Services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
+            builder.Services.AddTransient<IAccountWineApiService, WineApiService>();
             builder.Services.AddTransient<IIdentityApiService, IdentityApiService>();
             builder.Services.AddTransient<IAccountService, AccountService>();
 

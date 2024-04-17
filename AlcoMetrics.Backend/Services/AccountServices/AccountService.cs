@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-using WebApp.Data.ViewModel.Request.Account;
+﻿using WebApp.Data.ViewModel.Request.Account;
 using WebApp.Services.AccountServices.Abstract;
 using WebApp.Services.API.IdentityApi.Abstract;
+using WebApp.Services.API.WineApi.Abstract;
 
 namespace WebApp.Services.AccountServices
 {
@@ -10,11 +10,20 @@ namespace WebApp.Services.AccountServices
     /// </summary>
     public class AccountService : IAccountService
     {
+        private const string WINE_API_ERROR = "Ошибка при создании пользователе в виноделии. Возможно сервис не доступен в данный момент.";
+
+        private const string IDENTITY_API_ERROR = "Ошибка при создании авторизационного пользователе . Возможно сервис авторизаци не доступен в данный момент.";
+
+        private const string INVALID_DATA_ERROR = "Логин или пароль не были заполнены";
+
         private readonly IIdentityApiService _identityApiService;
 
-        public AccountService(IIdentityApiService identityApiService)
+        private readonly IAccountWineApiService _accountWineApi;
+
+        public AccountService(IIdentityApiService identityApiService, IAccountWineApiService accountWineApi)
         {
             _identityApiService = identityApiService;
+            _accountWineApi = accountWineApi;
         }
 
         /// <summary>
@@ -25,7 +34,7 @@ namespace WebApp.Services.AccountServices
         public async Task<string?> Login(LoginViewModel model)
         {
             if (string.IsNullOrEmpty(model.Login) || string.IsNullOrEmpty(model.Password))
-                return null;
+                return INVALID_DATA_ERROR;
 
             return await _identityApiService.GetTokenByPasswordGrantType(model.Login, model.Password);
         }
@@ -38,22 +47,31 @@ namespace WebApp.Services.AccountServices
         public async Task<IEnumerable<string>> RegisterAdmin(RegisterAdminViewModel model)
         {
             if (string.IsNullOrEmpty(model.Login) || string.IsNullOrEmpty(model.Password))
-                return Enumerable.Empty<string>();
+                return new List<string> { INVALID_DATA_ERROR };
 
             return await _identityApiService.RegisterAdminByPasswordGrantType(model.Login, model.Password) ?? Enumerable.Empty<string>();
         }
 
         /// <summary>
         /// Зарегестрировать администратора
+        /// Сначала создаем аутентификационного пользователя
+        /// Затем пользователя для виноделия
         /// </summary>
-        /// <param name="model"> Модель с логином и паролем </param>
+        /// <param name="model"> Модель для регистрации пользователя</param>
         /// <returns></returns>
         public async Task<IEnumerable<string>> RegisterUser(RegisterUserViewModel model)
         {
             if (string.IsNullOrEmpty(model.Login) || string.IsNullOrEmpty(model.Password))
-                return Enumerable.Empty<string>();
+                return new List<string> { INVALID_DATA_ERROR };
 
-            return await _identityApiService.RegisterUserByPasswordGrantType(model.Login, model.Password) ?? Enumerable.Empty<string>();
+            var identityResult = await _identityApiService.RegisterUserByPasswordGrantType(model.Login, model.Password, model.UserRole);
+            if (identityResult == null) return new List<string> { IDENTITY_API_ERROR };
+            if (identityResult.Count() > 0) return identityResult;
+
+            var wineResult = await _accountWineApi.RegisterUser(model.Login, model.Password);
+            if (!wineResult) return new List<string> { WINE_API_ERROR };
+
+            return Enumerable.Empty<string>();
         }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using IdentityModel.Client;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Net.Http.Headers;
 using WebApp.Extensions;
 using WebApp.Services.API.IdentityApi.Abstract;
@@ -90,10 +88,19 @@ namespace WebApp.Services.API.IdentityApi
         /// </summary>
         /// <param name="login"> Логин </param>
         /// <param name="password"> Пароль </param>
+        /// <param name="userRole"> Роль пользователя </param>
         /// <returns></returns>
-        public async Task<IEnumerable<string>?> RegisterUserByPasswordGrantType(string login, string password)
+        public async Task<IEnumerable<string>?> RegisterUserByPasswordGrantType(string login, string password, int userRole)
         {
-            throw new NotImplementedException();
+            var domenPath = _configuration.TryGetValue("ApiIntegrationSettings:IdentityService:AuthenticationServicePath", "Конфигурация не содержит доменный путь до Identity Server");
+            var registerUserPath = _configuration.TryGetValue("ApiIntegrationSettings:IdentityService:RegisterUserPath", "Конфигурация не содержит путь для регистрации пользователя до Identity Server");
+
+            var path = $"{domenPath}/{registerUserPath}";
+
+            var httpClient = new HttpClient();
+            using var response = await httpClient.PostAsJsonAsync(path, new { Login = login, Password = password, UserRole = userRole });
+
+            return await response.Content.ReadFromJsonAsync<IEnumerable<string>>();
         }
     }
 }
