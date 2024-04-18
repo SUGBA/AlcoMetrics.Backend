@@ -32,7 +32,7 @@ namespace WebApp.Services.API.IdentityApi
 
             var domenPath = _configuration.TryGetValue("ApiIntegrationSettings:IdentityService:AuthenticationServicePath", "Конфигурация не содержит доменный путь");
             var getTokenPath = _configuration.TryGetValue("ApiIntegrationSettings:IdentityService:GetTokenPath", "Конфигурация не содержит путь для получения токена");
-            var scope = _configuration.TryGetValues("AuthSetting:WineClientSettings:Scopes", "Конфигурация не содержит scopes");
+            var scope = _configuration.TryGetValue("AuthSetting:WineClientSettings:Scopes", "Конфигурация не содержит scopes");
             var clientId = _configuration.TryGetValue("AuthSetting:WineClientSettings:ClientId", "Конфигурация не содержит id клиента");
             var secret = _configuration.TryGetValue("AuthSetting:WineClientSettings:WineAuthSecret", "Конфигурация не содержит пользовательский секрет");
             var grantType = _configuration["AuthSetting:PasswordGrantTypeAuth:GrantType"] ?? "password";
@@ -45,7 +45,7 @@ namespace WebApp.Services.API.IdentityApi
                 GrantType = grantType,
                 ClientId = clientId,
                 ClientSecret = secret,
-                Scope = string.Join(" ", scope),
+                Scope = scope,
                 UserName = login,
                 Password = password
             };

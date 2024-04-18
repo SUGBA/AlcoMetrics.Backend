@@ -8,6 +8,6 @@
         /// <summary>
         /// Роль пользователя
         /// </summary>
-        public int UserRole { get; set; }
+        public int UserRole { get; set; } = 2;//Дефолтное значение = винодел, когда появится возможность регистрироваться по ролям убрать
     }
 }
