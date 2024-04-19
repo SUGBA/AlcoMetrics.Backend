@@ -5,6 +5,6 @@
     /// </summary>
     public interface IAccountWineApiService
     {
-        Task<bool> RegisterUser(string Login, string Password);
+        Task<bool> RegisterUser(string Login, string Password, int id);
     }
 }

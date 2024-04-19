@@ -47,10 +47,10 @@ namespace WebApp.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("RegisterAdmin")]
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IEnumerable<string>> RegisterAdmin([FromBody] RegisterAdminViewModel model)
         {
-            var result =  await _accountService.RegisterAdmin(model);
+            var result = await _accountService.RegisterAdmin(model);
             if (result.Count() > 0) HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
             return result;
         }

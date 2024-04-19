@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using WebApp.Data.ViewModel.Request.Account;
+﻿using WebApp.Data.ViewModel.Request.Account;
 
 namespace WebApp.Services.AccountServices.Abstract
 {

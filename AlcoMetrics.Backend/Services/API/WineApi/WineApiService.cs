@@ -15,7 +15,7 @@ namespace WebApp.Services.API.WineApi
             _configuration = configuration;
         }
 
-        public async Task<bool> RegisterUser(string login, string password)
+        public async Task<bool> RegisterUser(string login, string password, int id)
         {
             var domenPath = _configuration.TryGetValue("ApiIntegrationSettings:WineService:WineServicePath", "Конфигурация не содержит доменный путь до Wine Server");
             var registerPath = _configuration.TryGetValue("ApiIntegrationSettings:WineService:RegisterUserPath", "Конфигурация не содержит путь для регистрации пользователя в Wine Server");
@@ -23,7 +23,7 @@ namespace WebApp.Services.API.WineApi
             var path = $"{domenPath}/{registerPath}";
 
             var httpClient = new HttpClient();
-            using var response = await httpClient.PostAsJsonAsync(path, new { Login = login, Password = password});
+            using var response = await httpClient.PostAsJsonAsync(path, new { Login = login, Password = password, UserId = id });
 
             return await response.Content.ReadFromJsonAsync<bool>();
         }

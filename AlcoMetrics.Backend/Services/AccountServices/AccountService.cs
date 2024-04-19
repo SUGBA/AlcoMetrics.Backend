@@ -49,7 +49,7 @@ namespace WebApp.Services.AccountServices
             if (string.IsNullOrEmpty(model.Login) || string.IsNullOrEmpty(model.Password))
                 return new List<string> { INVALID_DATA_ERROR };
 
-            return await _identityApiService.RegisterAdminByPasswordGrantType(model.Login, model.Password) ?? Enumerable.Empty<string>();
+            return (await _identityApiService.RegisterAdminByPasswordGrantType(model.Login, model.Password))?.Errors ?? new List<string> { IDENTITY_API_ERROR };
         }
 
         /// <summary>
@@ -65,10 +65,10 @@ namespace WebApp.Services.AccountServices
                 return new List<string> { INVALID_DATA_ERROR };
 
             var identityResult = await _identityApiService.RegisterUserByPasswordGrantType(model.Login, model.Password, model.UserRole);
-            if (identityResult == null) return new List<string> { IDENTITY_API_ERROR };
-            if (identityResult.Count() > 0) return identityResult;
+            if (identityResult == null || identityResult.UserId == default(int)) return new List<string> { IDENTITY_API_ERROR };
+            if (identityResult.Errors.Count() > 0) return identityResult.Errors;
 
-            var wineResult = await _accountWineApi.RegisterUser(model.Login, model.Password);
+            var wineResult = await _accountWineApi.RegisterUser(model.Login, model.Password, identityResult.UserId);
             if (!wineResult) return new List<string> { WINE_API_ERROR };
 
             return Enumerable.Empty<string>();

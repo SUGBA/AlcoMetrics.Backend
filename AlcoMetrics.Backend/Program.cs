@@ -1,4 +1,4 @@
-using IdentityModel;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using WebApp.Extensions;
 using WebApp.Services.AccountServices;
@@ -40,8 +40,7 @@ namespace AlcoMetrics.Backend
                 options.TokenValidationParameters.ValidAudiences = new List<string>() {
                     builder.Configuration.TryGetValue("AuthSetting:IdentitySettings:ApiName", "Конфиги не содержат наименование API для IdentityServer"),
                     builder.Configuration.TryGetValue("AuthSetting:IdentitySettings:ApiSecret", "Конфиги не содержат секрет API для IdentityServer"),
-                    JwtClaimTypes.Role
-            };
+                    ClaimTypes.Role};
             });
 
             builder.Services.AddHttpContextAccessor();
