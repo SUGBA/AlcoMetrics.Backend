@@ -65,7 +65,7 @@ namespace WebApp.Services.AccountServices
                 return new List<string> { INVALID_DATA_ERROR };
 
             var identityResult = await _identityApiService.RegisterUserByPasswordGrantType(model.Login, model.Password, model.UserRole);
-            if (identityResult == null || identityResult.UserId == default(int)) return new List<string> { IDENTITY_API_ERROR };
+            if (identityResult == null) return new List<string> { IDENTITY_API_ERROR };
             if (identityResult.Errors.Count() > 0) return identityResult.Errors;
 
             var wineResult = await _accountWineApi.RegisterUser(model.Login, model.Password, identityResult.UserId);
