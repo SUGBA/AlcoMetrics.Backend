@@ -68,7 +68,7 @@ namespace WebApp.Services.AccountServices
             if (identityResult == null) return new List<string> { IDENTITY_API_ERROR };
             if (identityResult.Errors.Count() > 0) return identityResult.Errors;
 
-            var wineResult = await _accountWineApi.RegisterUser(model.Login, model.Password, identityResult.UserId);
+            var wineResult = await _accountWineApi.RegisterUser(identityResult.UserId);
             if (!wineResult) return new List<string> { WINE_API_ERROR };
 
             return Enumerable.Empty<string>();
